@@ -69,7 +69,7 @@ func (cfg *apiConfig) handlerPostChirp(w http.ResponseWriter, r *http.Request) {
 
 	chirp, err := cfg.db.CreateChirp(cleaned)
 	if err != nil {
-		log.Printf("Error decoding parameters: %s", err)
+		log.Printf("Error creating Chirp: %s", err)
 		responseWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}

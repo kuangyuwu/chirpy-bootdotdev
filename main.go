@@ -28,9 +28,10 @@ func main() {
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 	mux.HandleFunc("/api/reset", apiCfg.handlerReset)
 	// mux.HandleFunc("POST /api/validate_chirp", handlerValidateChirp)
-	mux.HandleFunc("GET /api/chirps/{$}", apiCfg.handlerGetChirps)
+	mux.HandleFunc("GET /api/chirps", apiCfg.handlerGetChirps)
 	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerGetChirpById)
-	mux.HandleFunc("POST /api/chirps", apiCfg.handlerPostChirp)
+	mux.HandleFunc("POST /api/chirps/{$}", apiCfg.handlerPostChirp)
+	mux.HandleFunc("POST /api/users", apiCfg.handlerPostUser)
 
 	fileSrv := http.FileServer(http.Dir(filepathRoot))
 	fileSrv = http.StripPrefix("/app", fileSrv)
