@@ -69,9 +69,10 @@ func (db *DB) GetChirps() ([]Chirp, error) {
 		return nil, err
 	}
 
-	chirps := make([]Chirp, 0, len(dbStructure.Chirps))
-	for _, chirp := range dbStructure.Chirps {
-		chirps = append(chirps, chirp)
+	n := len(dbStructure.Chirps)
+	chirps := make([]Chirp, len(dbStructure.Chirps))
+	for i := 0; i < n; i++ {
+		chirps[i] = dbStructure.Chirps[i+1]
 	}
 
 	return chirps, nil

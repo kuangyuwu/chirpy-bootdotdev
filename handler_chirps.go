@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +18,28 @@ func (cfg *apiConfig) handlerGetChirps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseWithJson(w, http.StatusOK, chirps)
+}
+
+func (cfg *apiConfig) handlerGetChirpById(w http.ResponseWriter, r *http.Request) {
+	chirps, err := cfg.db.GetChirps()
+	if err != nil {
+		log.Printf("Error decoding parameters: %s", err)
+		responseWithError(w, http.StatusInternalServerError, "Something went wrong")
+		return
+	}
+
+	id_string := r.PathValue("chirpID")
+	id, err := strconv.Atoi(id_string)
+	if err != nil {
+		log.Println("Error:", err)
+		responseWithError(w, http.StatusBadRequest, "Invalid Chirp ID")
+	}
+	if id > len(chirps) {
+		responseWithError(w, http.StatusNotFound, "Chirp does not exist")
+		return
+	}
+	fmt.Println(id)
+	responseWithJson(w, http.StatusOK, chirps[id-1])
 }
 
 func (cfg *apiConfig) handlerPostChirp(w http.ResponseWriter, r *http.Request) {
