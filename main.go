@@ -32,6 +32,7 @@ func main() {
 	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerGetChirpById)
 	mux.HandleFunc("POST /api/chirps/{$}", apiCfg.handlerPostChirp)
 	mux.HandleFunc("POST /api/users", apiCfg.handlerPostUser)
+	mux.HandleFunc("POST /api/login", apiCfg.handlerLogin)
 
 	fileSrv := http.FileServer(http.Dir(filepathRoot))
 	fileSrv = http.StripPrefix("/app", fileSrv)
