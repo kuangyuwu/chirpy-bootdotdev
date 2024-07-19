@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/kuangyuwu/chirpy-bootdev/internal/auth"
 )
@@ -48,7 +49,16 @@ func (cfg *apiConfig) handlerPostUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) handlerUpdateUser(w http.ResponseWriter, r *http.Request) {
+
+	tokenString, _ := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+	id, err := auth.ValidateToken(tokenString, cfg.jwtSecret)
+	if err != nil {
+		log.Printf("Error validating token: %s", err)
+		responseWithError(w, http.StatusUnauthorized, "Error validating token")
+		return
+	}
+
 	type parameters struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -56,29 +66,29 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err := decoder.Decode(&params)
+	err = decoder.Decode(&params)
 	if err != nil {
 		log.Printf("Error decoding parameters: %s", err)
 		responseWithError(w, http.StatusInternalServerError, "error decoding parameters")
 		return
 	}
 
-	user, err := cfg.db.GetUserByEmail(params.Email)
+	hashed, err := auth.HashPassword(params.Password)
 	if err != nil {
-		log.Printf("Error: %s", err)
-		responseWithError(w, http.StatusUnauthorized, "User not found")
+		log.Printf("Error hashing password: %s", err)
+		responseWithError(w, http.StatusInternalServerError, "error hashing password")
 		return
 	}
 
-	err = auth.CheckPassword(user.Hashed, params.Password)
+	newUser, err := cfg.db.UpdateUser(id, params.Email, hashed)
 	if err != nil {
-		log.Printf("Error: %s", err)
-		responseWithError(w, http.StatusUnauthorized, "Incorrect password")
+		log.Printf("Error updating user: %s", err)
+		responseWithError(w, http.StatusInternalServerError, "error updating user")
 		return
 	}
 
 	responseWithJson(w, http.StatusOK, User{
-		Id:    user.Id,
-		Email: user.Email,
+		Id:    newUser.Id,
+		Email: newUser.Email,
 	})
 }
