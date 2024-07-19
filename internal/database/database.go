@@ -14,8 +14,9 @@ type DB struct {
 }
 
 type DBStructure struct {
-	Chirps map[int]Chirp `json:"chirps"`
-	Users  map[int]User  `json:"users"`
+	Chirps        map[int]Chirp           `json:"chirps"`
+	Users         map[int]User            `json:"users"`
+	RefreshTokens map[string]RefreshToken `json:"refresh_tokens"`
 }
 
 // NewDB creates a new database connection
@@ -29,8 +30,9 @@ func NewDB(path string) (*DB, error) {
 	_, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		dbStructure := DBStructure{
-			Chirps: map[int]Chirp{},
-			Users:  map[int]User{},
+			Chirps:        map[int]Chirp{},
+			Users:         map[int]User{},
+			RefreshTokens: map[string]RefreshToken{},
 		}
 		err = db.writeDB(dbStructure)
 	}

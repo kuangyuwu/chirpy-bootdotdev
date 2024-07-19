@@ -40,6 +40,8 @@ func main() {
 	mux.HandleFunc("POST /api/users", apiCfg.handlerPostUser)
 	mux.HandleFunc("PUT /api/users", apiCfg.handlerUpdateUser)
 	mux.HandleFunc("POST /api/login", apiCfg.handlerLogin)
+	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefresh)
+	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
 
 	fileSrv := http.FileServer(http.Dir(filepathRoot))
 	fileSrv = http.StripPrefix("/app", fileSrv)

@@ -27,3 +27,7 @@ func responseWithError(w http.ResponseWriter, code int, msg string) {
 	}
 	responseWithJson(w, code, respBody)
 }
+
+func responseWithNoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
+}
